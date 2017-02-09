@@ -1,0 +1,28 @@
+{
+  "name": "server-stats-mqtt",
+  "version": "0.0.1",
+  "description": "Basic monitoring of a machine, published via MQTT.",
+  "main": "index.js",
+  "dependencies": {
+    "mosca": "^2.2.0",
+    "mqtt": "^2.3.1"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "mqtt",
+    "monitor",
+    "vps",
+    "server",
+    "free",
+    "ram",
+    "average",
+    "load",
+    "disk",
+    "usage"
+  ],
+  "author": "Oscar Campbell",
+  "license": "ISC"
+}
