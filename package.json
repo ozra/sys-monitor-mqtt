@@ -4,6 +4,7 @@
   "description": "Basic monitoring of a machine, published via MQTT.",
   "main": "index.js",
   "dependencies": {
+    "js-yaml": "^3.8.1",
     "mqtt": "^2.3.1"
   },
   "devDependencies": {
