@@ -14,6 +14,7 @@ say = (...args) ->
 _D = say
 
 pub = (topic, msg, qos = 0, retain = false) ->
+   say "publish #{topic}; #{msg}"
    mqttc.publish topic, "" + msg
    return
 
@@ -21,9 +22,9 @@ sub = (topic) ->
    mqttc.subscribe topic
 
 
-mqtt-port = 1899
+mqtt-port = 1883
 check-interval = 5000
-disk-to-report = 0
+disk-to-report = 1
 
 total-mem = 0
 mqttc = null
@@ -34,7 +35,7 @@ GiB = 1024 * 1024 * 1024.0
 
 
 connect-to-broker = (cb) ->
-   mqttc := mqtt.connect "mqtt://localhost:1899"
+   mqttc := mqtt.connect "mqtt://localhost:#{mqtt-port}"
    mqttc.on "connect", cb
    return
 
@@ -57,6 +58,7 @@ init = (cb) ->
    return cb()
 
 check = ->
+   say "check"
    ram = os.freemem() / MiB
    one-five-and-fifteen = os.loadavg()
    ram-perc = (total-mem - ram) / total-mem
@@ -75,6 +77,7 @@ check = ->
    pub "sys/free", Math.round ram, 2
    pub "sys/cpu(1m)", Math.round(one-five-and-fifteen.0 * 100, 0)
    pub "sys/uptime", uptime 
+   say "check done"
    return
 
 start-checking = ->
@@ -85,6 +88,7 @@ main = ->
    say "kicking off!"
 
    <- init
+   say "start checking"
    start-checking()
    return
 
