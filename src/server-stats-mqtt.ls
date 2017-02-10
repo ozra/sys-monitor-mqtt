@@ -13,16 +13,9 @@ say = (...args) ->
 
 _D = say
 
-pub-via-exec = (topic, msg, qos = 0, retain = false) ->
-   cmd = "mosquitto_pub -p #{mqtt-port} -t \"#{topix}\" -m \"#{msg}\""
-   exec cmd
+pub = (topic, msg, qos = 0, retain = false) ->
+   mqttc.publish topic, "" + msg
    return
-
-pub-via-mod = (topic, msg, qos = 0, retain = false) ->
-   mqttc.publish topic, msg
-   return
-
-pub = pub-via-mod
 
 sub = (topic) ->
    mqttc.subscribe topic
@@ -46,7 +39,7 @@ connect-to-broker = (cb) ->
 
 handle-message = (topic, msg) ->
    switch topic
-   when "vps/stats-monitor/interval"
+   when "sys/stats-monitor/interval"
       check-interval := parse-int msg
       clear-interval checker-tmr
       start-checking()
@@ -58,7 +51,7 @@ handle-message = (topic, msg) ->
 init = (cb) ->
    total-mem := os.totalmem() / MiB
    err <- connect-to-broker
-   sub "vps/stats-monitor/interval"
+   sub "sys/stats-monitor/interval"
    mqttc.on "message", handle-message 
    return cb()
 
@@ -75,33 +68,24 @@ check = ->
       dfree = cut-up.8.3.replace /G$/, ""
       # say "disk free: #{dfree}"
       
-      cmd = "mosquitto_pub -p #{mqtt-port} -t \"dfree\" -m \"#{dfree}\""
-      exec cmd
+      pub "sys/dfree", dfree
       return
 
-   # say "data for pub: ", ram, ", ", total-mem, " (", ram-perc, ") ", one-five-and-fifteen.join " - "
-
-   cmd = "mosquitto_pub -p #{mqtt-port} -t \"free\" -m \"#{Math.round(ram, 2)}\""
-   exec cmd
-
-   cmd = "mosquitto_pub -p #{mqtt-port} -t \"load(1m)\" -m \"#{Math.round(one-five-and-fifteen.0 * 100, 0)}\""
-   exec cmd
-
-   cmd = "mosquitto_pub -p #{mqtt-port} -t \"uptime\" -m \"#{uptime}\""
-   exec cmd
-   
-   mqttc.publish "vps/foo", "Testing yaaau!"
-
+   pub "sys/free", Math.round ram, 2
+   pub "sys/cpu(1m)", Math.round(one-five-and-fifteen.0 * 100, 0)
+   pub "sys/uptime", uptime 
    return
 
 start-checking = ->
    checker-tmr := set-interval check, check-interval
+   return
 
 main = ->
-   say "do stuff"
+   say "kicking off!"
 
    <- init
    start-checking()
+   return
 
 main()
 
