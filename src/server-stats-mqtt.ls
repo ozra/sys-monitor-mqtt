@@ -23,6 +23,7 @@ sub = (topic) ->
 
 mqtt-port = 1899
 check-interval = 5000
+disk-to-report = 0
 
 total-mem = 0
 mqttc = null
@@ -65,7 +66,7 @@ check = ->
    exec cmd, (c, o, e) ->
       # say "std: #{o}\nerr: #{e}\ncode: #{c}\n"
       cut-up = o.split("\n").map (s) -> s.split(/\s+/)
-      dfree = cut-up.8.3.replace /G$/, ""
+      dfree = cut-up[disk-to-report].3.replace /G$/, ""
       # say "disk free: #{dfree}"
       
       pub "sys/dfree", dfree
